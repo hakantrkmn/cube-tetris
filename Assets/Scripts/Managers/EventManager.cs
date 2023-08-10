@@ -16,9 +16,11 @@ public static class EventManager
     public static Func<bool> IsPointerOverUI;
     #endregion
 
-  
 
- 
+    public static Func<Vector3> GetBorders;
+
+
+
 
 
 }
