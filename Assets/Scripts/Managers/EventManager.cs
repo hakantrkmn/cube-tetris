@@ -20,6 +20,8 @@ public static class EventManager
     public static Func<Vector3> GetBorders;
 
 
+    public static Action<TetrisCube> CubePainted;
+    public static Action SpawnCubeOnColumns;
 
 
 

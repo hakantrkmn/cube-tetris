@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3863946606104210449}
   - component: {fileID: 242789113572151139}
   - component: {fileID: 4695291804129381423}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: TetrisCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.9, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &242789113572151139
 Rigidbody:
@@ -128,7 +128,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collider: {fileID: 3863946606104210449}
+  rb: {fileID: 242789113572151139}
   renderer: {fileID: 6784334678164631111}
   color: {r: 0, g: 0, b: 0, a: 0}
   bounds: {x: 0, y: 0, z: 0}
   neighbours: []
+  sameColorNeighbours: []
+  tetrisCubeLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  directions:
+  - {x: 1, y: 0, z: 0}
+  - {x: -1, y: 0, z: 0}
+  - {x: 0, y: 1, z: 0}
+  - {x: 0, y: -1, z: 0}
+  boxChecked: 0

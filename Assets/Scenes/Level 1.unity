@@ -665,12 +665,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tetrisCubePrefab: {fileID: 4695291804129381423, guid: 3b5e83cf8c7a1491a9a61ede05a4a56f,
     type: 3}
+  spawnPointPrefab: {fileID: 5928064824730607850, guid: 8eaa72b89e5d64282b04278806941daa,
+    type: 3}
   tetrisCubes: []
   xSpawnPoints: []
   ground: {fileID: 874825426}
   spawnPointsParent: {fileID: 2132159230}
   tetrisCubesParent: {fileID: 1023985757}
-  tetrisSize: {x: 3, y: 3}
+  tetrisSize: {x: 10, y: 10}
+  tetrisCubeScale: 0
 --- !u!4 &1478068095
 Transform:
   m_ObjectHideFlags: 0
