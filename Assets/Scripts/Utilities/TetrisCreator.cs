@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
@@ -10,22 +11,53 @@ using Random = UnityEngine.Random;
 public class TetrisCreator : MonoBehaviour
 {
     public TetrisCube tetrisCubePrefab;
-    public GameObject spawnPointPrefab;
+    public GameObject columnPointPrefab;
+    public GameObject rowPointPrefab;
 
     public List<TetrisCube> tetrisCubes;
-    public List<SpawnPoint> xSpawnPoints;
+    public List<Column> columnPoints;
+    public List<Transform> rowPositions;
+
     public Transform ground;
     public Transform spawnPointsParent;
     public Transform tetrisCubesParent;
+    public Transform rowParent;
 
     public Vector2 tetrisSize;
 
     public float tetrisCubeScale;
 
+    public List<Color> colors;
+
+    private void OnValidate()
+    {
+        for (int i = 0; i < colors.Count; i++)
+        {
+            colors[i] = new Color(float.Parse(colors[i].r.ToString("F1")), float.Parse(colors[i].g.ToString("F1")),
+                float.Parse(colors[i].b.ToString("F1")));
+        }
+    }
+
     private void OnEnable()
     {
+        EventManager.CheckForRows += CheckForRows;
         EventManager.CubePainted += CubePainted;
         EventManager.SpawnCubeOnColumns += SpawnCubeOnColumns;
+    }
+
+    private void CheckForRows()
+    {
+        
+        foreach (var row in rowPositions)
+        {
+            row.GetComponent<Row>().CheckForRow();
+        }
+
+        foreach (var sp in columnPoints)
+        {
+            sp.GetBoxes();
+        }
+        
     }
 
     private void CubePainted(TetrisCube obj)
@@ -35,39 +67,16 @@ public class TetrisCreator : MonoBehaviour
 
     private void OnDisable()
     {
+        EventManager.CheckForRows -= CheckForRows;
         EventManager.CubePainted -= CubePainted;
         EventManager.SpawnCubeOnColumns -= SpawnCubeOnColumns;
     }
 
+    [Button]
     private void SpawnCubeOnColumns()
     {
-        foreach (var spawnPoint in xSpawnPoints)
-        {
-            if (spawnPoint.columnBoxes.Count<spawnPoint.columnMaxBoxAmount)
-            {
-                for (int i = 0; i < spawnPoint.columnMaxBoxAmount-spawnPoint.columnBoxes.Count; i++)
-                {
-                    var cube = Instantiate(tetrisCubePrefab.gameObject, Vector3.zero, quaternion.identity, tetrisCubesParent);
-                    cube.transform.localPosition =
-                        new Vector3(spawnPoint.transform.position.x, spawnPoint.transform.position.y + (i*tetrisCubeScale), 0);
-                    cube.transform.localScale = Vector3.one*tetrisCubeScale;
-                    if (Random.value>.5f)
-                    {
-                        var color = Color.red;
-                        cube.GetComponent<TetrisCube>().color = color;
-                        cube.GetComponent<TetrisCube>().renderer.material.color = color;
-                    }
-                    else
-                    {
-                        var color = Color.green;
-                        cube.GetComponent<TetrisCube>().color = color;
-                        cube.GetComponent<TetrisCube>().renderer.material.color = color;
-                    }
-                
-                    tetrisCubes.Add(cube.GetComponent<TetrisCube>());
-                }
-            }
-        }
+        var col = columnPoints.OrderBy(x => x.columnBoxes.Count).ToList();
+        col.First().SpawnCube(tetrisCubePrefab.gameObject,tetrisCubesParent,tetrisCubeScale,colors[Random.Range(0, colors.Count)],tetrisCubes);
     }
 
     [Button]
@@ -101,40 +110,24 @@ public class TetrisCreator : MonoBehaviour
         
         var xAmount = tetrisSize.x;
         var yAmount = tetrisSize.y;
+        
 
         ground.transform.position = new Vector3(ground.transform.position.x, -border.y, ground.transform.position.z);
-        for (int i = 0; i < xAmount; i++)
-        {
-            var spawnPoint = Instantiate(spawnPointPrefab, Vector3.zero, quaternion.identity, spawnPointsParent);
-            spawnPoint.name = "Spawn_Point_" + i;
-            spawnPoint.transform.SetParent(spawnPointsParent);
-            spawnPoint.transform.localPosition = new Vector3((i * bounds.x * 2) - (bounds.x*(xAmount-1)) , border.y, 0);
-            xSpawnPoints.Add(spawnPoint.GetComponent<SpawnPoint>());
-            spawnPoint.GetComponent<SpawnPoint>().columnMaxBoxAmount = (int)yAmount;
-        }
-
+        
+        CreateRowAndColumnTransforms((int)xAmount,(int)yAmount,border,bounds);
         
 
         for (int i = 0; i < yAmount; i++)
         {
-            for (int j = 0; j < xSpawnPoints.Count; j++)
+            for (int j = 0; j < columnPoints.Count; j++)
             {
                 var cube = Instantiate(tetrisCubePrefab.gameObject, Vector3.zero, quaternion.identity, tetrisCubesParent);
                 cube.transform.localPosition =
-                    new Vector3(xSpawnPoints[j].transform.position.x, xSpawnPoints[j].transform.position.y-(i*bounds.y*2), 0);
+                    new Vector3(columnPoints[j].transform.position.x, columnPoints[j].transform.position.y-(i*bounds.y*2), 0);
                 cube.transform.localScale = new Vector3(xScale, xScale, xScale);
-                if (Random.value>.5f)
-                {
-                    var color = Color.red;
-                    cube.GetComponent<TetrisCube>().color = color;
-                    cube.GetComponent<TetrisCube>().renderer.material.color = color;
-                }
-                else
-                {
-                    var color = Color.green;
-                    cube.GetComponent<TetrisCube>().color = color;
-                    cube.GetComponent<TetrisCube>().renderer.material.color = color;
-                }
+                var color = colors[Random.Range(0, colors.Count)];
+                cube.GetComponent<TetrisCube>().color = color;
+                cube.GetComponent<TetrisCube>().renderer.material.color = color;
                 
                 tetrisCubes.Add(cube.GetComponent<TetrisCube>());
             }
@@ -144,10 +137,45 @@ public class TetrisCreator : MonoBehaviour
         
     }
 
+    public void CreateRowAndColumnTransforms(int xAmount, int yAmount, Vector3 border, Vector2 bounds)
+    {
+        for (int i = 0; i < yAmount; i++)
+        {
+            var row = Instantiate(rowPointPrefab, Vector3.zero, quaternion.identity, rowParent);
+            row.transform.SetParent(rowParent);
+            row.transform.position = new Vector3(ground.transform.position.x-10, (-border.y + tetrisCubeScale/2)+ i * tetrisCubeScale, ground.transform.position.z);
+            rowPositions.Add(row.transform);
+            row.GetComponent<Row>().columnMaxBoxAmount=(int)xAmount;
+        }
+        for (int i = 0; i < xAmount; i++)
+        {
+            var column = Instantiate(columnPointPrefab, Vector3.zero, quaternion.identity, spawnPointsParent);
+            column.name = "Column_Point_" + i;
+            column.transform.SetParent(spawnPointsParent);
+            column.transform.localPosition = new Vector3((i * bounds.x * 2) - (bounds.x*(xAmount-1)) , border.y, 0);
+            columnPoints.Add(column.GetComponent<Column>());
+            column.GetComponent<Column>().columnMaxBoxAmount = (int)yAmount;
+        }
+    }
+
+    private float timer;
+    private float spawnTime = .3f;
+    private void Update()
+    {
+        timer += Time.deltaTime;
+        if (timer>spawnTime)
+        {
+            //SpawnCubeOnColumns();
+            timer = 0;
+            spawnTime = Random.Range(.3f, .6f);
+
+        }
+    }
+
     [Button]
     public void GetColumnBoxes()
     {
-        foreach (var point in xSpawnPoints)
+        foreach (var point in columnPoints)
         {
             point.GetBoxes();
         }

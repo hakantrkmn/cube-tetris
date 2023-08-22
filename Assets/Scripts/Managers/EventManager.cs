@@ -19,6 +19,9 @@ public static class EventManager
 
     public static Func<Vector3> GetBorders;
 
+    public static Action<bool> PlayerCanClick;
+
+    public static Action CheckForRows;
 
     public static Action<TetrisCube> CubePainted;
     public static Action SpawnCubeOnColumns;

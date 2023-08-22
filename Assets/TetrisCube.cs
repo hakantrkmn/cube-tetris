@@ -21,18 +21,21 @@ public class TetrisCube : MonoBehaviour
     public LayerMask tetrisCubeLayer;
 
     public List<Vector3> directions;
+
+    public bool isDestroyed;
     [Button]
     public void SetColor()
     {
         color = renderer.material.color;
-
     }
+
     [Button]
     public void RandomColor()
     {
         color = Random.ColorHSV();
-            renderer.material.color = color;
+        renderer.material.color = color;
     }
+
     [Button]
     public void SetBound()
     {
@@ -40,33 +43,37 @@ public class TetrisCube : MonoBehaviour
     }
 
     public bool boxChecked;
+    public bool painted;
 
     public void DestroyCube()
     {
+        //gameObject.SetActive(false);
         rb.isKinematic = true;
         collider.enabled = false;
-        transform.DOScale(0, .2f).OnComplete(() =>
-        {
-            gameObject.SetActive(false);
-        });
+        transform.DOScale(0, .2f).OnComplete(() => { gameObject.SetActive(false); });
+        
     }
+
     [Button]
-    public void GetSameColorNeighbours(List<TetrisCube> sameColorCubes)
+    public void GetSameColorNeighbours(List<TetrisCube> sameColorCubes,Color paintColor)
     {
         if (boxChecked) return;
-        
+
+        Debug.Log("1");
+        renderer.material.DOColor(paintColor, .3f);
+        transform.DOPunchScale(Vector3.one * .1f, .3f);
         boxChecked = true;
-        
+
         if (!sameColorCubes.Contains(this))
         {
             sameColorCubes.Add(this);
         }
-        
+
         GetNeighbours();
-            
+
         foreach (var neighbour in neighbours)
         {
-            if (neighbour.color==color)
+            if (neighbour.color == color)
             {
                 sameColorNeighbours.Add(neighbour);
                 if (!sameColorCubes.Contains(neighbour))
@@ -75,16 +82,28 @@ public class TetrisCube : MonoBehaviour
                 }
             }
         }
+        color=paintColor;
 
-        foreach (var cube in sameColorNeighbours)
+
+        DOVirtual.DelayedCall(.1f, () =>
         {
-            if (!cube.boxChecked)
+            foreach (var cube in sameColorNeighbours)
             {
-                cube.GetSameColorNeighbours(sameColorCubes);
+                if (!cube.boxChecked)
+                {
+                    cube.GetSameColorNeighbours(sameColorCubes,paintColor);
+                }
+            }
+        }).OnComplete(() =>
+        {
+            if (sameColorCubes.Last()==this)
+            {
+                EventManager.PlayerCanClick(true);
+                EventManager.CheckForRows();
 
             }
-        }
 
+        });
     }
 
     public void GetNeighbours()
@@ -94,16 +113,26 @@ public class TetrisCube : MonoBehaviour
         foreach (var direction in directions)
         {
             var tempCube = GetBoxOnDirection(direction);
-            if (tempCube && tempCube!=this)
+            if (tempCube && tempCube != this)
             {
                 neighbours.Add(tempCube);
             }
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.GetComponent<TetrisCube>())
+        {
+            EventManager.CheckForRows();
+        }
+        
+    }
+
     private void Update()
     {
-        if (rb.IsSleeping()) {
+        if (rb.IsSleeping())
+        {
             rb.WakeUp();
         }
     }
@@ -111,7 +140,7 @@ public class TetrisCube : MonoBehaviour
     public TetrisCube GetBoxOnDirection(Vector3 direction)
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, direction, out hit, Mathf.Infinity,tetrisCubeLayer))
+        if (Physics.Raycast(transform.position, direction, out hit, transform.localScale.x, tetrisCubeLayer))
         {
             return hit.transform.GetComponent<TetrisCube>();
         }
@@ -120,7 +149,4 @@ public class TetrisCube : MonoBehaviour
             return null;
         }
     }
-    
-    
-    
 }
