@@ -13,6 +13,8 @@ public class Column : MonoBehaviour
     public LayerMask tetrisCubeLayer;
     public int columnMaxBoxAmount;
 
+    public int boxAmount;
+
     private void OnEnable()
     {
         EventManager.CubePainted += CubePainted;
@@ -43,22 +45,23 @@ public class Column : MonoBehaviour
                 }
             }
         }
+
+        boxAmount = columnBoxes.Count;
     }
 
     public void SpawnCube(GameObject prefab, Transform parent, float scale, Color color, List<TetrisCube> tetrisCubes)
     {
         var cube = Instantiate(prefab.gameObject, Vector3.zero, quaternion.identity, parent);
-                cube.transform.localPosition =
-                    new Vector3(transform.position.x, transform.position.y + (scale), 0);
-                cube.transform.localScale = Vector3.one * scale;
+        cube.transform.localPosition =
+            new Vector3(transform.position.x, transform.position.y + (scale * boxAmount), 0);
+        cube.transform.localScale = Vector3.one * scale;
+        cube.GetComponent<TetrisCube>().color = color;
+        cube.GetComponent<TetrisCube>().renderer.material.color = color;
+        columnBoxes.Add(cube.GetComponent<TetrisCube>());
+        tetrisCubes.Add(cube.GetComponent<TetrisCube>());
+        boxAmount++;
 
-                cube.GetComponent<TetrisCube>().color = color;
-                cube.GetComponent<TetrisCube>().renderer.material.color = color;
-                columnBoxes.Add(cube.GetComponent<TetrisCube>());
-                tetrisCubes.Add(cube.GetComponent<TetrisCube>());           
-        
-            
-        
+
     }
 
     private void OnDrawGizmos()

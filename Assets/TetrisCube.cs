@@ -59,9 +59,8 @@ public class TetrisCube : MonoBehaviour
     {
         if (boxChecked) return;
 
-        Debug.Log("1");
         renderer.material.DOColor(paintColor, .3f);
-        transform.DOPunchScale(Vector3.one * .1f, .3f);
+        //transform.DOPunchScale(Vector3.one * .1f, .3f);
         boxChecked = true;
 
         if (!sameColorCubes.Contains(this))
@@ -99,7 +98,9 @@ public class TetrisCube : MonoBehaviour
             if (sameColorCubes.Last()==this)
             {
                 EventManager.PlayerCanClick(true);
+                
                 EventManager.CheckForRows();
+                
 
             }
 
@@ -124,7 +125,7 @@ public class TetrisCube : MonoBehaviour
     {
         if (collision.transform.GetComponent<TetrisCube>())
         {
-            EventManager.CheckForRows();
+            //EventManager.CheckForRows();
         }
         
     }

@@ -40,22 +40,49 @@ public class TetrisCreator : MonoBehaviour
 
     private void OnEnable()
     {
+        EventManager.SpawnCubeAtColumn += SpawnCubeAtColumn;
         EventManager.CheckForRows += CheckForRows;
         EventManager.CubePainted += CubePainted;
         EventManager.SpawnCubeOnColumns += SpawnCubeOnColumns;
     }
 
+    private void SpawnCubeAtColumn(TetrisCube obj)
+    {
+        foreach (var col in columnPoints)
+        {
+            col.GetBoxes();
+            Debug.Log(col.columnBoxes.Count + " en başta");
+            if (col.columnBoxes.Contains(obj))
+            {
+                col.SpawnCube(tetrisCubePrefab.gameObject, tetrisCubesParent, tetrisCubeScale,
+                    colors[Random.Range(0, colors.Count)], tetrisCubes);
+            }
+        }
+    }
+
     private void CheckForRows()
     {
-        
+        var falseCount = 0;
         foreach (var row in rowPositions)
         {
-            row.GetComponent<Row>().CheckForRow();
+            if (!row.GetComponent<Row>().CheckForRow())
+            {
+                falseCount++;
+            }
         }
+        
 
-        foreach (var sp in columnPoints)
+        
+        if (falseCount == rowPositions.Count)
         {
-            sp.GetBoxes();
+            foreach (var col in columnPoints)
+            {
+                Debug.Log("sdfsd");
+                col.GetBoxes();
+
+                col.SpawnCube(tetrisCubePrefab.gameObject, tetrisCubesParent, tetrisCubeScale,
+                    colors[Random.Range(0, colors.Count)], tetrisCubes);
+            }
         }
         
     }
@@ -67,6 +94,7 @@ public class TetrisCreator : MonoBehaviour
 
     private void OnDisable()
     {
+        EventManager.SpawnCubeAtColumn -= SpawnCubeAtColumn;
         EventManager.CheckForRows -= CheckForRows;
         EventManager.CubePainted -= CubePainted;
         EventManager.SpawnCubeOnColumns -= SpawnCubeOnColumns;
@@ -75,8 +103,9 @@ public class TetrisCreator : MonoBehaviour
     [Button]
     private void SpawnCubeOnColumns()
     {
-        var col = columnPoints.OrderBy(x => x.columnBoxes.Count).ToList();
-        col.First().SpawnCube(tetrisCubePrefab.gameObject,tetrisCubesParent,tetrisCubeScale,colors[Random.Range(0, colors.Count)],tetrisCubes);
+        var col = columnPoints[Random.Range(0, columnPoints.Count)];
+        col.SpawnCube(tetrisCubePrefab.gameObject, tetrisCubesParent, tetrisCubeScale,
+            colors[Random.Range(0, colors.Count)], tetrisCubes);
     }
 
     [Button]
@@ -88,14 +117,13 @@ public class TetrisCreator : MonoBehaviour
         }
 
         tetrisCubes.Clear();
-        
-        
-        
+
+
         var border = EventManager.GetBorders();
         border -= new Vector3(1, 1, 0);
         var xScale = (border.x * 2) / tetrisSize.x;
         var yScale = (border.y * 2) / tetrisSize.y;
-        if (yScale<xScale)
+        if (yScale < xScale)
         {
             xScale = yScale;
         }
@@ -104,36 +132,38 @@ public class TetrisCreator : MonoBehaviour
             yScale = xScale;
         }
 
-        var bounds = new Vector2(xScale / 2,yScale/2);
+        var bounds = new Vector2(xScale / 2, yScale / 2);
 
         tetrisCubeScale = xScale;
-        
+
         var xAmount = tetrisSize.x;
         var yAmount = tetrisSize.y;
-        
+
 
         ground.transform.position = new Vector3(ground.transform.position.x, -border.y, ground.transform.position.z);
-        
-        CreateRowAndColumnTransforms((int)xAmount,(int)yAmount,border,bounds);
-        
 
-        for (int i = 0; i < yAmount; i++)
-        {
+        CreateRowAndColumnTransforms((int)xAmount, (int)yAmount, border, bounds);
+
+        
             for (int j = 0; j < columnPoints.Count; j++)
             {
-                var cube = Instantiate(tetrisCubePrefab.gameObject, Vector3.zero, quaternion.identity, tetrisCubesParent);
-                cube.transform.localPosition =
-                    new Vector3(columnPoints[j].transform.position.x, columnPoints[j].transform.position.y-(i*bounds.y*2), 0);
-                cube.transform.localScale = new Vector3(xScale, xScale, xScale);
-                var color = colors[Random.Range(0, colors.Count)];
-                cube.GetComponent<TetrisCube>().color = color;
-                cube.GetComponent<TetrisCube>().renderer.material.color = color;
-                
-                tetrisCubes.Add(cube.GetComponent<TetrisCube>());
-            }
-            
-        }
+                for (int i = 0; i < columnPoints[j].columnMaxBoxAmount; i++)
+                {
+                    var cube = Instantiate(tetrisCubePrefab.gameObject, Vector3.zero, quaternion.identity,
+                        tetrisCubesParent);
+                    cube.transform.localPosition =
+                        new Vector3(columnPoints[j].transform.position.x,
+                            columnPoints[j].transform.position.y + (i * bounds.y * 2), 0);
+                    cube.transform.localScale = new Vector3(xScale, xScale, xScale);
+                    var color = colors[Random.Range(0, colors.Count)];
+                    cube.GetComponent<TetrisCube>().color = color;
+                    cube.GetComponent<TetrisCube>().renderer.material.color = color;
 
+                    tetrisCubes.Add(cube.GetComponent<TetrisCube>());
+                }
+
+                
+            }
         
     }
 
@@ -143,32 +173,34 @@ public class TetrisCreator : MonoBehaviour
         {
             var row = Instantiate(rowPointPrefab, Vector3.zero, quaternion.identity, rowParent);
             row.transform.SetParent(rowParent);
-            row.transform.position = new Vector3(ground.transform.position.x-10, (-border.y + tetrisCubeScale/2)+ i * tetrisCubeScale, ground.transform.position.z);
+            row.transform.position = new Vector3(ground.transform.position.x - 10,
+                (-border.y + tetrisCubeScale / 2) + i * tetrisCubeScale, ground.transform.position.z);
             rowPositions.Add(row.transform);
-            row.GetComponent<Row>().columnMaxBoxAmount=(int)xAmount;
+            row.GetComponent<Row>().columnMaxBoxAmount = (int)xAmount;
         }
+
         for (int i = 0; i < xAmount; i++)
         {
             var column = Instantiate(columnPointPrefab, Vector3.zero, quaternion.identity, spawnPointsParent);
             column.name = "Column_Point_" + i;
             column.transform.SetParent(spawnPointsParent);
-            column.transform.localPosition = new Vector3((i * bounds.x * 2) - (bounds.x*(xAmount-1)) , border.y, 0);
+            column.transform.localPosition = new Vector3((i * bounds.x * 2) - (bounds.x * (xAmount - 1)), border.y, 0);
             columnPoints.Add(column.GetComponent<Column>());
-            column.GetComponent<Column>().columnMaxBoxAmount = (int)yAmount;
+            column.GetComponent<Column>().columnMaxBoxAmount = Random.Range(2, yAmount);
         }
     }
 
     private float timer;
     private float spawnTime = .3f;
+
     private void Update()
     {
         timer += Time.deltaTime;
-        if (timer>spawnTime)
+        if (timer > spawnTime)
         {
             //SpawnCubeOnColumns();
             timer = 0;
             spawnTime = Random.Range(.3f, .6f);
-
         }
     }
 
@@ -180,6 +212,7 @@ public class TetrisCreator : MonoBehaviour
             point.GetBoxes();
         }
     }
+
     private void Start()
     {
         CreateTetris();

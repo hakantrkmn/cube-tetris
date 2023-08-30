@@ -709,12 +709,11 @@ MonoBehaviour:
   spawnPointsParent: {fileID: 2132159230}
   tetrisCubesParent: {fileID: 1023985757}
   rowParent: {fileID: 673477154}
-  tetrisSize: {x: 10, y: 10}
+  tetrisSize: {x: 9, y: 9}
   tetrisCubeScale: 0
   colors:
   - {r: 0.9, g: 0, b: 0, a: 1}
   - {r: 1, g: 0.9, b: 0, a: 1}
-  - {r: 0.1, g: 0.3, b: 0.9, a: 1}
 --- !u!4 &1478068095
 Transform:
   m_ObjectHideFlags: 0

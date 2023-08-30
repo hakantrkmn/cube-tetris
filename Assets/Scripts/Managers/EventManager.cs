@@ -22,6 +22,7 @@ public static class EventManager
     public static Action<bool> PlayerCanClick;
 
     public static Action CheckForRows;
+    public static Action<TetrisCube> SpawnCubeAtColumn;
 
     public static Action<TetrisCube> CubePainted;
     public static Action SpawnCubeOnColumns;

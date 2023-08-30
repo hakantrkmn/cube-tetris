@@ -17,25 +17,31 @@ public class Row : MonoBehaviour
         Gizmos.DrawRay(transform.position,Vector3.right*100);
     }
 
-    public void CheckForRow()
+    public bool CheckForRow()
     {
         GetBoxes();
+        var falseCount = 0;
+        var trueCount = 0;
         if (rowBoxes.Count==0)
         {
-            return;
+            return false;
         }
         var color = rowBoxes[0].color;
         foreach (var box in rowBoxes)
         {
             if (box.color!=color)
             {
-                return;
+                falseCount++;
+            }
+            else
+            {
+                trueCount++;
             }
         }
 
-        if (rowBoxes.Count!=columnMaxBoxAmount)
+        if (trueCount!= rowBoxes.Count)
         {
-            return;
+            return false;
         }
         foreach (var box in rowBoxes)
         {
@@ -46,7 +52,9 @@ public class Row : MonoBehaviour
         {
             box.DestroyCube();
         }
-        
+
+        return true;
+
 
 
     }

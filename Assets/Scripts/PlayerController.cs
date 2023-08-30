@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -9,8 +10,9 @@ public class PlayerController : MonoBehaviour
     public List<TetrisCube> sameColorCubes;
     public bool canClick = true;
 
+    public List<Color> colors;
     public Color currentColor;
-
+    private int colorIndex;
     private void OnEnable()
     {
         EventManager.PlayerCanClick += b => canClick = b;
@@ -21,6 +23,22 @@ public class PlayerController : MonoBehaviour
         EventManager.PlayerCanClick -= b => canClick = b;
     }
 
+    [Button]
+    public void Test()
+    {
+        foreach (var cube in sameColorCubes)
+        {
+            EventManager.SpawnCubeAtColumn(cube);
+        }
+    }
+    private void OnValidate()
+    {
+        for (int i = 0; i < colors.Count; i++)
+        {
+            colors[i] = new Color(float.Parse(colors[i].r.ToString("F1")), float.Parse(colors[i].g.ToString("F1")),
+                float.Parse(colors[i].b.ToString("F1")));
+        }
+    }
     private void Update()
     {
         if (Input.GetMouseButtonDown(0) && canClick)
@@ -32,22 +50,18 @@ public class PlayerController : MonoBehaviour
             {
                 if (hit.transform.GetComponent<TetrisCube>())
                 {
-                    canClick = false;
                     foreach (var cube in hit.transform.GetComponentInParent<TetrisCreator>().tetrisCubes)
                     {
                         cube.boxChecked = false;
                     }
 
                     hit.transform.GetComponent<TetrisCube>().GetSameColorNeighbours(sameColorCubes, currentColor);
-                    /*foreach (var cube in sameColorCubes)
+                    colorIndex++;
+                    if (colorIndex >= colors.Count)
                     {
-                        cube.color = Color.red;
-                        cube.boxChecked = false;
+                        colorIndex = 0;
                     }
-                    sameColorCubes.Clear();
-                    */
-                    //hit.transform.GetComponent<TetrisCube>().GetSameColorNeighbours(sameColorCubes,.1f);
-                    //ColorBoxes(sameColorCubes);
+                    currentColor = colors[colorIndex];
                 }
             }
         }
