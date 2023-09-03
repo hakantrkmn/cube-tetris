@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -48,9 +49,16 @@ public class Row : MonoBehaviour
             box.isDestroyed = true;
             EventManager.CubePainted(box);
         }
+
+        var middlePoint = Vector3.zero;
         foreach (var box in rowBoxes)
         {
-            box.DestroyCube();
+            middlePoint += box.transform.position;
+        }
+        middlePoint /= rowBoxes.Count;
+        foreach (var box in rowBoxes)
+        {
+            box.DestroyCube(middlePoint);
         }
 
         return true;

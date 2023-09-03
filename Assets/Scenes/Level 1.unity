@@ -504,7 +504,7 @@ GameObject:
   - component: {fileID: 874825428}
   - component: {fileID: 874825427}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -620,6 +620,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sameColorCubes: []
   canClick: 1
+  colors:
+  - {r: 0.9, g: 0, b: 0, a: 1}
+  - {r: 1, g: 0.9, b: 0, a: 1}
+  - {r: 0, g: 0, b: 0, a: 1}
   currentColor: {r: 0.9, g: 0, b: 0, a: 1}
 --- !u!4 &993212949
 Transform:
@@ -677,6 +681,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1478068095}
   - component: {fileID: 1478068094}
+  - component: {fileID: 1478068096}
   m_Layer: 0
   m_Name: TetrisCreator
   m_TagString: Untagged
@@ -709,11 +714,11 @@ MonoBehaviour:
   spawnPointsParent: {fileID: 2132159230}
   tetrisCubesParent: {fileID: 1023985757}
   rowParent: {fileID: 673477154}
-  tetrisSize: {x: 9, y: 9}
-  tetrisCubeScale: 0
+  tetrisSize: {x: 9, y: 15}
   colors:
   - {r: 0.9, g: 0, b: 0, a: 1}
   - {r: 1, g: 0.9, b: 0, a: 1}
+  - {r: 0, g: 0, b: 0, a: 1}
 --- !u!4 &1478068095
 Transform:
   m_ObjectHideFlags: 0
@@ -733,6 +738,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1478068096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478068093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a9d62103d92d44fea86d64c662e58df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1853154304
 GameObject:
   m_ObjectHideFlags: 0
@@ -742,7 +759,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1853154307}
-  - component: {fileID: 1853154306}
   - component: {fileID: 1853154305}
   - component: {fileID: 1853154308}
   m_Layer: 0
@@ -767,18 +783,6 @@ MonoBehaviour:
   gameData: {fileID: 11400000, guid: 551e80de1de59e44d81cc446cff8a315, type: 2}
   PlayerMovementSettings: {fileID: 11400000, guid: 09bcb116bfab34df6a623a6d0d7aaf70,
     type: 2}
---- !u!114 &1853154306
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1853154304}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8eb6491dc576d14c9f7227a70f8b698, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1853154307
 Transform:
   m_ObjectHideFlags: 0
@@ -833,7 +837,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1916325035
 MeshCollider:
   m_ObjectHideFlags: 0

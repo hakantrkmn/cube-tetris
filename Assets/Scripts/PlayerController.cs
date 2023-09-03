@@ -35,8 +35,7 @@ public class PlayerController : MonoBehaviour
     {
         for (int i = 0; i < colors.Count; i++)
         {
-            colors[i] = new Color(float.Parse(colors[i].r.ToString("F1")), float.Parse(colors[i].g.ToString("F1")),
-                float.Parse(colors[i].b.ToString("F1")));
+            colors[i] = Utility.MakeColorF1(colors[i]);
         }
     }
     private void Update()
@@ -64,31 +63,6 @@ public class PlayerController : MonoBehaviour
                     currentColor = colors[colorIndex];
                 }
             }
-        }
-    }
-
-
-    public void ColorBoxes(List<TetrisCube> cubes)
-    {
-        if (cubes.Count > 1)
-        {
-            Sequence cubePaint = DOTween.Sequence();
-            foreach (var cube in cubes)
-            {
-                cubePaint.Join(cube.renderer.material.DOColor(Color.red, .5f));
-            }
-
-            foreach (var cube in cubes)
-            {
-                cubePaint.AppendCallback(() => { cube.DestroyCube(); });
-            }
-
-            foreach (var cube in cubes)
-            {
-                cubePaint.AppendCallback(() => { EventManager.CubePainted(cube); });
-            }
-
-            cubePaint.AppendCallback(() => { EventManager.SpawnCubeOnColumns(); });
         }
     }
 }

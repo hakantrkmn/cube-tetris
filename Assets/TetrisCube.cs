@@ -45,12 +45,18 @@ public class TetrisCube : MonoBehaviour
     public bool boxChecked;
     public bool painted;
 
-    public void DestroyCube()
+    public void DestroyCube(Vector3 middlePoint)
     {
         //gameObject.SetActive(false);
         rb.isKinematic = true;
         collider.enabled = false;
-        transform.DOScale(0, .2f).OnComplete(() => { gameObject.SetActive(false); });
+        transform.DOMoveZ(transform.position.z-.5f, 1f).OnComplete(() =>
+        {
+            rb.constraints = RigidbodyConstraints.None;
+            rb.isKinematic = false;
+            rb.angularVelocity = Random.insideUnitSphere * 10;
+            rb.AddExplosionForce(200,middlePoint,100);
+        });
         
     }
 
