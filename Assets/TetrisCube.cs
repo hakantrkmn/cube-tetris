@@ -56,6 +56,10 @@ public class TetrisCube : MonoBehaviour
             rb.isKinematic = false;
             rb.angularVelocity = Random.insideUnitSphere * 10;
             rb.AddExplosionForce(200,middlePoint,100);
+            DOVirtual.DelayedCall(1, () =>
+            {
+                EventManager.DestroyCube(this);
+            });
         });
         
     }
@@ -129,10 +133,7 @@ public class TetrisCube : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.transform.GetComponent<TetrisCube>())
-        {
-            //EventManager.CheckForRows();
-        }
+        
         
     }
 

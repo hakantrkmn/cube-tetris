@@ -52,8 +52,10 @@ public class PlayerController : MonoBehaviour
                     foreach (var cube in hit.transform.GetComponentInParent<TetrisCreator>().tetrisCubes)
                     {
                         cube.boxChecked = false;
+                        cube.sameColorNeighbours.Clear();
                     }
 
+                    canClick = false;
                     hit.transform.GetComponent<TetrisCube>().GetSameColorNeighbours(sameColorCubes, currentColor);
                     colorIndex++;
                     if (colorIndex >= colors.Count)

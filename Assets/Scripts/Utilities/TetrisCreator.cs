@@ -10,13 +10,14 @@ using Random = UnityEngine.Random;
 
 public class TetrisCreator : MonoBehaviour
 {
+    public CubePool pool;
     public TetrisCube tetrisCubePrefab;
     public GameObject columnPointPrefab;
     public GameObject rowPointPrefab;
 
-    [HideInInspector]public List<TetrisCube> tetrisCubes;
-    [HideInInspector]public List<Column> columnPoints;
-    [HideInInspector]public List<Transform> rowPositions;
+    [HideInInspector] public List<TetrisCube> tetrisCubes;
+    [HideInInspector] public List<Column> columnPoints;
+    [HideInInspector] public List<Transform> rowPositions;
 
     public Transform ground;
     public Transform spawnPointsParent;
@@ -56,7 +57,7 @@ public class TetrisCreator : MonoBehaviour
         {
             col.GetBoxes();
 
-            col.SpawnCube(tetrisCubePrefab.gameObject, tetrisCubesParent, tetrisCubeScale,
+            col.SpawnCube(tetrisCubeScale,
                 colors[Random.Range(0, colors.Count)], tetrisCubes);
         }
     }
@@ -73,7 +74,7 @@ public class TetrisCreator : MonoBehaviour
     }
 
 
-    void CreateTetris()
+    public void CreateTetris()
     {
         foreach (var cube in tetrisCubes)
         {
@@ -115,8 +116,7 @@ public class TetrisCreator : MonoBehaviour
         {
             for (int i = 0; i < column.columnMaxBoxAmount; i++)
             {
-                var cube = Instantiate(tetrisCubePrefab.gameObject, Vector3.zero, quaternion.identity,
-                    tetrisCubesParent);
+                var cube = EventManager.GetCubeFromPool();
                 cube.transform.localPosition =
                     new Vector3(column.transform.position.x,
                         column.transform.position.y + (i * bounds.y * 2), 0);
@@ -132,7 +132,7 @@ public class TetrisCreator : MonoBehaviour
 
     void CreateRowAndColumnTransforms(int xAmount, int yAmount, Vector3 border, Vector2 bounds)
     {
-        for (int i = 0; i < yAmount; i++)
+        for (int i = 0; i < yAmount * 3; i++)
         {
             var row = Instantiate(rowPointPrefab, Vector3.zero, quaternion.identity, rowParent);
             row.transform.SetParent(rowParent);
@@ -151,10 +151,5 @@ public class TetrisCreator : MonoBehaviour
             columnPoints.Add(column.GetComponent<Column>());
             column.GetComponent<Column>().columnMaxBoxAmount = yAmount;
         }
-    }
-
-    private void Start()
-    {
-        CreateTetris();
     }
 }

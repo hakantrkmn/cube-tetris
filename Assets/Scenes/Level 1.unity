@@ -505,7 +505,7 @@ GameObject:
   - component: {fileID: 874825427}
   m_Layer: 0
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -622,7 +622,6 @@ MonoBehaviour:
   canClick: 1
   colors:
   - {r: 0.9, g: 0, b: 0, a: 1}
-  - {r: 1, g: 0.9, b: 0, a: 1}
   - {r: 0, g: 0, b: 0, a: 1}
   currentColor: {r: 0.9, g: 0, b: 0, a: 1}
 --- !u!4 &993212949
@@ -701,6 +700,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e7322f6c1a254451bfb056897064fe7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pool: {fileID: 1478068096}
   tetrisCubePrefab: {fileID: 4695291804129381423, guid: 3b5e83cf8c7a1491a9a61ede05a4a56f,
     type: 3}
   columnPointPrefab: {fileID: 5928064824730607850, guid: 8eaa72b89e5d64282b04278806941daa,
@@ -714,7 +714,7 @@ MonoBehaviour:
   spawnPointsParent: {fileID: 2132159230}
   tetrisCubesParent: {fileID: 1023985757}
   rowParent: {fileID: 673477154}
-  tetrisSize: {x: 9, y: 15}
+  tetrisSize: {x: 9, y: 5}
   colors:
   - {r: 0.9, g: 0, b: 0, a: 1}
   - {r: 1, g: 0.9, b: 0, a: 1}
@@ -747,9 +747,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1478068093}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a9d62103d92d44fea86d64c662e58df, type: 3}
+  m_Script: {fileID: 11500000, guid: 2927f2bb39bd8470b82cbb1f6835d506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cubePrefab: {fileID: 4695291804129381423, guid: 3b5e83cf8c7a1491a9a61ede05a4a56f,
+    type: 3}
+  poolSize: 0
+  tetrisCreator: {fileID: 1478068094}
+  tetrisCubesParent: {fileID: 1023985757}
 --- !u!1 &1853154304
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,13 +23,14 @@ public class Row : MonoBehaviour
         GetBoxes();
         var falseCount = 0;
         var trueCount = 0;
-        if (rowBoxes.Count==0)
+        if (rowBoxes.Count<2)
         {
             return false;
         }
         var color = rowBoxes[0].color;
         foreach (var box in rowBoxes)
         {
+            
             if (box.color!=color)
             {
                 falseCount++;

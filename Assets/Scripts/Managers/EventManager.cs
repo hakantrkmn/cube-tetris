@@ -15,7 +15,9 @@ public static class EventManager
     public static Func<bool> IsTouching;
     public static Func<bool> IsPointerOverUI;
     #endregion
+    public static Action<TetrisCube> DestroyCube;
 
+    public static Func<TetrisCube> GetCubeFromPool;
 
     public static Func<Vector3> GetBorders;
 
